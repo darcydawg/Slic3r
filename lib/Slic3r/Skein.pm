@@ -3,7 +3,7 @@ use Moo;
 
 use Config;
 use File::Basename qw(basename fileparse);
-use Slic3r::Geometry qw(PI);
+use Slic3r::Geometry qw(X Y PI unscale);
 use Time::HiRes qw(gettimeofday tv_interval);
 use XXX;
 
@@ -146,6 +146,17 @@ sub go {
     printf "Done. Process took %d minutes and %.3f seconds\n", 
         int($self->processing_time/60),
         $self->processing_time - int($self->processing_time/60)*60;
+
+    printf "Final printed dimensions: x: %dmm, y: %dmm, z: %0.2fmm\n",
+        unscale $print->total_x_length,
+        unscale $print->total_y_length,
+        $print->layer_count * $Slic3r::layer_height;
+
+    printf "Extents: x: %d to %dmm, y: %d to %dmm\n",
+        $Slic3r::print_center->[X] - (unscale $print->total_x_length / 2),
+        $Slic3r::print_center->[X] + (unscale $print->total_x_length / 2),
+        $Slic3r::print_center->[Y] - (unscale $print->total_y_length / 2),
+        $Slic3r::print_center->[Y] + (unscale $print->total_y_length / 2);
     
     # TODO: more statistics!
     printf "Filament required: %.1fmm (%.1fcm3)\n",
