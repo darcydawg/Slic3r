@@ -105,6 +105,8 @@ our $support_material   = 0;
 our $support_material_tool = 0;
 our $start_gcode = "G28 ; home all axes";
 our $end_gcode = <<"END";
+G92 E0; zero extruder
+G1 E-1 F1800; retract 1mm 
 M104 S0 ; turn off temperature
 G28 X0  ; home X axis
 M84     ; disable motors
