@@ -9,7 +9,7 @@ require v5.10;
 
 our $VERSION = "0.7.1-dev";
 
-our $debug = 1;
+our $debug = 0;
 sub debugf {
     printf @_ if $debug;
 }
