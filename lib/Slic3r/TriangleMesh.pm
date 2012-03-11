@@ -1,7 +1,7 @@
 package Slic3r::TriangleMesh;
 use Moo;
 
-use Slic3r::Geometry qw(X Y Z A B epsilon same_point);
+use Slic3r::Geometry qw(X Y Z A B unscale epsilon same_point);
 use XXX;
 
 # public
@@ -219,6 +219,7 @@ sub make_loops {
                 $next_line = $lines[$by_a_id{$line->b_id}];
             } else {
                 Slic3r::debugf "  line has no next_facet_index or b_id\n";
+                XXX $line;
                 $layer->slicing_errors(1);
                 next CYCLE;
             }
@@ -355,11 +356,10 @@ sub slice_facet {
     }
     
     # calculate the layer extents
-    # (the -1 and +1 here are used as a quick and dirty replacement for some
-    # complex calculation of the first layer height ratio logic)
-    my $min_layer = int($min_z * $Slic3r::resolution / $Slic3r::layer_height) - 1;
+    my $first_layer_height = $Slic3r::layer_height * $Slic3r::first_layer_height_ratio;
+    my $min_layer = int((unscale($min_z) - ($first_layer_height + $Slic3r::layer_height / 2)) / $Slic3r::layer_height);
     $min_layer = 0 if $min_layer < 0;
-    my $max_layer = int($max_z * $Slic3r::resolution / $Slic3r::layer_height) + 1;
+    my $max_layer = int((unscale($max_z) - ($first_layer_height + $Slic3r::layer_height / 2)) / $Slic3r::layer_height) + 1;
     Slic3r::debugf "layers: min = %s, max = %s\n", $min_layer, $max_layer;
     
     for (my $layer_id = $min_layer; $layer_id <= $max_layer; $layer_id++) {
